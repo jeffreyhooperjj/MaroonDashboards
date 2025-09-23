@@ -69,7 +69,7 @@ function UserRow({user}) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box sx={{ flex: 1, minWidth: 0, gap: 1 }}>
-          <Card>
+          <Card sx={{ bgcolor: 'grey.300' }}>
             <CardContent>
               <Typography variant="h6" component="div" noWrap>
                 {user.name}
@@ -123,10 +123,10 @@ function UserRow({user}) {
         {prompts.map((prompt, index) => (
           <Card key={index} sx={{ bgcolor: 'grey.800' }}>
             <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-              <Typography variant="caption" color="darkblue" sx={{ fontWeight: 'medium' }}>
+              <Typography variant="body2" color="lightgray" sx={{ fontWeight: 'medium' }}>
                 {prompt.question}
               </Typography>
-              <Typography variant="body2" 
+              <Typography variant="caption" color="lightgray"
                 sx={{ 
                 mt: 0.5,
                 wordWrap: 'break-word',
