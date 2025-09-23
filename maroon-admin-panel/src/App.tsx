@@ -68,51 +68,49 @@ function UserRow({user}) {
 
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar sx={{ width: 64, height: 64, bgcolor: 'primary.main' }}>
-          {user.name.charAt(0)}
-        </Avatar>
         <Box sx={{ flex: 1, minWidth: 0, gap: 1 }}>
-          <Typography variant="h6" component="div" noWrap>
-            {user.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {user.email}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Joined: {joinDate}
-          </Typography>
-          <Box >
-            <Typography variant="body2">
-              Demographics
-            </Typography>
-            <Typography variant="body2">
-              Age: {user.age}
-            </Typography>
-            <Typography variant="body2">
-              Location: Lat: {user.location?.latitude} Long: {user.location?.longitude}
-            </Typography>
-            <Typography variant="body2">
-              Job Industry: {user.job_industry}
-            </Typography>
-            <Typography variant="body2">
-              Ethnicity: {user.ethnicity}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-            <Chip 
-              label="Verified" 
-              size="small" 
-              variant="outlined"
-            />
-            {user.has_premium && (
-              <Chip 
-                label="Premium" 
-                size="small" 
-                color="warning" 
-                variant="outlined"
-              />
-            )}
-          </Box>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" component="div" noWrap>
+                {user.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                {user.email}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Joined: {joinDate}
+              </Typography>
+              <Typography> Demographics </Typography>
+                <Typography variant="body2">
+                  Age: {user.age}
+                </Typography>
+                <Typography variant="body2">
+                  Location: Lat: {user.location?.latitude} Long: {user.location?.longitude}
+                </Typography>
+                <Typography variant="body2">
+                  Job Industry: {user.job_industry}
+                </Typography>
+                <Typography variant="body2">
+                  Ethnicity: {user.ethnicity}
+                </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                <Chip 
+                  label="Verified" 
+                  size="small" 
+                  variant="outlined"
+                />
+                {user.has_premium && (
+                  <Chip 
+                    label="Premium" 
+                    size="small" 
+                    color="warning" 
+                    variant="outlined"
+                  />
+                )}
+                {renderStatus(user)}
+              </Box>
+            </CardContent>
+          </Card>
         </Box>
       </Box>
     );
@@ -183,7 +181,6 @@ function UserRow({user}) {
       <Grid container spacing={1}>
         <Grid item size={3}>
           {renderNameInfo(user)}
-          {renderStatus(user)}
         </Grid>
         <Grid item size={4}>
           {renderPrompts(user)}
