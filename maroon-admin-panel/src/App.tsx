@@ -71,7 +71,7 @@ function UserRow({user}) {
         <Avatar sx={{ width: 64, height: 64, bgcolor: 'primary.main' }}>
           {user.name.charAt(0)}
         </Avatar>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ flex: 1, minWidth: 0, gap: 1 }}>
           <Typography variant="h6" component="div" noWrap>
             {user.name}
           </Typography>
@@ -81,6 +81,23 @@ function UserRow({user}) {
           <Typography variant="caption" color="text.secondary">
             Joined: {joinDate}
           </Typography>
+          <Box >
+            <Typography variant="body2">
+              Demographics
+            </Typography>
+            <Typography variant="body2">
+              Age: {user.age}
+            </Typography>
+            <Typography variant="body2">
+              Location: Lat: {user.location?.latitude} Long: {user.location?.longitude}
+            </Typography>
+            <Typography variant="body2">
+              Job Industry: {user.job_industry}
+            </Typography>
+            <Typography variant="body2">
+              Ethnicity: {user.ethnicity}
+            </Typography>
+          </Box>
           <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
             <Chip 
               label="Verified" 
