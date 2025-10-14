@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Stack, Card, CardContent, Box, Avatar, Grid, Paper, Typography, Button, TextField, Chip, CircularProgress } from '@mui/material';
+import { Stack, Card, CardContent, Box, Avatar, Grid,
+          Paper, Typography, Button, TextField, Chip,
+          CircularProgress, Snackbar, Alert } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -236,6 +238,8 @@ function UserRows({users}) {
 }
 
 function UserRow({user}) {
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
   const approveUserMutation = useMutation({
     mutationFn: async (userUuid) => {
       const session = await fetchAuthSession();
@@ -246,8 +250,17 @@ function UserRow({user}) {
         },
         method: 'POST'
       });
-      console.log("hello", await response.json());
-      return response.json();
+      const result = await response.json();
+      console.log("hello", result);
+      return result; 
+    },
+    onSuccess: () => {
+      setSnackbar({ open: true, message: 'User approved successfully!', severity: 'success' });
+      console.log("It worked");
+    },
+    onError: () => {
+      setSnackbar({ open: true, message: 'Failed to approve user', severity: 'error' });
+      console.log("It did not work", error);
     },
   });
   const renderStatus = (user) => {
@@ -382,30 +395,40 @@ function UserRow({user}) {
   
 
 
-  const approveUser = async () => {
+  const approveUser = () => {
     console.log("Before");
-    await approveUserMutation.mutate(user.user_uuid)
+    approveUserMutation.mutate(user.user_uuid)
     console.log("approve", user.user_uuid)
   }
 
   return (
-    <Paper sx={{ bgcolor: 'grey.600' }}>
-      <Grid container spacing={.5}>
-        <Grid item size={3}>
-          {renderNameInfo(user)}
+    <>
+      <Paper sx={{ bgcolor: 'grey.600' }}>
+        <Grid container spacing={.5}>
+          <Grid item size={3}>
+            {renderNameInfo(user)}
+          </Grid>
+          <Grid item size={4}>
+            {renderPrompts(user)}
+          </Grid>
+          <Grid item size={3.5}>
+            {renderImages(user)}
+          </Grid>
+          <Grid item size={1}>
+            <Button variant="outlined" color="red" onClick={approveUser} disabled={!user.waitlisted}>{approveUserMutation.isPending ? "Approving" : "Approve"}</Button>
+          </Grid>
         </Grid>
-        <Grid item size={4}>
-          {renderPrompts(user)}
-        </Grid>
-        <Grid item size={3.5}>
-          {renderImages(user)}
-        </Grid>
-        <Grid item size={1}>
-          <Button variant="outlined" color="red" onClick={approveUser} disabled={!user.waitlisted}>{approveUserMutation.isPending ? "Approving" : "Approve"}</Button>
-        </Grid>
-      </Grid>
-    </Paper>
-    
+      </Paper>
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   )
   
 }
