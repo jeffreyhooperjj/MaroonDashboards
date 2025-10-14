@@ -7,7 +7,8 @@ export default defineConfig({
   // Vite config (vite.config.js)
   server: {
     proxy: {
-      '/admin': 'http://localhost:8069'
+      //'/admin': 'http://localhost:8069'
+      '/admin': 'https://h9mgp2jta3.us-east-2.awsapprunner.com/'
     }
   }
 })
