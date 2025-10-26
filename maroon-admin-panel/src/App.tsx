@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Stack, Card, CardContent, Box, Avatar, Grid,
           Paper, Typography, Button, TextField, Chip,
-          CircularProgress, Snackbar, Alert } from '@mui/material';
+          CircularProgress, Snackbar, Alert, Select, MenuItem } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -239,28 +239,31 @@ function UserRows({users}) {
 
 function UserRow({user}) {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [tier, setTier] = useState(user.tier ?? "tier4");
 
   const approveUserMutation = useMutation({
-    mutationFn: async (userUuid) => {
+    mutationFn: async ({userUuid, userTier}) => {
       const session = await fetchAuthSession();
       const token = session.tokens?.accessToken?.toString();
-      const response = await fetch(`/admin/approve/${userUuid}`, {
+      const response = await fetch(`/admin/approve`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        method: 'POST'
+        method: 'POST',
+        body: JSON.stringify({
+          user_uuid: userUuid,
+          tier: userTier,
+        })
       });
       const result = await response.json();
-      console.log("hello", result);
       return result; 
     },
     onSuccess: () => {
       setSnackbar({ open: true, message: 'User approved successfully!', severity: 'success' });
-      console.log("It worked");
     },
     onError: () => {
       setSnackbar({ open: true, message: 'Failed to approve user', severity: 'error' });
-      console.log("It did not work", error);
     },
   });
   const renderStatus = (user) => {
@@ -396,9 +399,11 @@ function UserRow({user}) {
 
 
   const approveUser = () => {
-    console.log("Before");
-    approveUserMutation.mutate(user.user_uuid)
-    console.log("approve", user.user_uuid)
+    if (!tier) {
+      console.log("tier is not set");
+      return;
+    }
+    approveUserMutation.mutate({userUuid: user.user_uuid, userTier: tier})
   }
 
   return (
@@ -415,6 +420,20 @@ function UserRow({user}) {
             {renderImages(user)}
           </Grid>
           <Grid item size={1}>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={tier}
+              label="User's Tier"
+              onChange={(event) => {
+                setTier(event.target.value);
+              }}
+            >
+            <MenuItem value={"tier1"}>Tier 1</MenuItem>
+            <MenuItem value={"tier2"}>Tier 2</MenuItem>
+            <MenuItem value={"tier3"}>Tier 3</MenuItem>
+            <MenuItem value={"tier4"}>Tier 4</MenuItem>
+          </Select>
             <Button variant="outlined" color="red" onClick={approveUser} disabled={!user.waitlisted}>{approveUserMutation.isPending ? "Approving" : "Approve"}</Button>
           </Grid>
         </Grid>
