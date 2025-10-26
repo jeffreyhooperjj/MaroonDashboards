@@ -428,6 +428,7 @@ function UserRow({user}) {
               onChange={(event) => {
                 setTier(event.target.value);
               }}
+              disabled={!user.waitlisted}
             >
             <MenuItem value={"tier1"}>Tier 1</MenuItem>
             <MenuItem value={"tier2"}>Tier 2</MenuItem>
