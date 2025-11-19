@@ -27,7 +27,7 @@ Amplify.configure({
 const queryClient = new QueryClient()
 
 const makeRequest = async ({ queryKey }) => {
-  const [, page, lastItemViewed] = queryKey;
+  const [, page, lastItemViewed, nameFilter, statusFilter, pageSize] = queryKey;
 
   const session = await fetchAuthSession();
   const token = session.tokens?.accessToken?.toString();
@@ -37,6 +37,10 @@ const makeRequest = async ({ queryKey }) => {
   if (lastItemViewed) {
     params.set('last_viewed_uuid', lastItemViewed);
   }
+  if (nameFilter) params.set('name', nameFilter);
+  if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
+  if (pageSize) params.set("page_size", pageSize)
+
   const url = '/admin/users?' + params.toString();
 
   console.log(url);
@@ -454,58 +458,133 @@ function UserRow({user}) {
 }
 
 
-function Header({onPrevPage, onNextPage, onLogout}) {
+function Header({
+  onPrevPage,
+  onNextPage,
+  onLogout,
+  pageSize,
+  setPageSize,
+  nameFilterInput,
+  setNameFilterInput,
+  statusFilter,
+  setStatusFilter,
+  resetPagination
+}) {
   return (
-    <div>
+    <Box sx={{ p: 2, mb: 2, borderBottom: "1px solid #ddd" }}>
+      
+      {/* Top Row */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>Maroon Admin Panel</h1>
-        <Button 
-          variant="outlined"
-          color="error"
-          onClick={onLogout}
-        >
+
+        <Button variant="outlined" color="error" onClick={onLogout}>
           Logout
         </Button>
       </Box>
-      <Button 
-        size="medium" 
-        color="darkblue"
-        onClick={onPrevPage}
-      >
-        Prev Page
-      </Button>
-      <Button 
-        size="medium" 
-        color="darkblue"
-        onClick={onNextPage}
-      >
-        Next Page
-      </Button>
-    </div>
-  )
+
+      {/* Pagination Buttons */}
+      <Box sx={{ mt: 1 }}>
+        <Button size="medium" color="darkblue" onClick={onPrevPage}>
+          Prev Page
+        </Button>
+        <Button size="medium" color="darkblue" sx={{ ml: 1 }} onClick={onNextPage}>
+          Next Page
+        </Button>
+      </Box>
+
+      {/* Filters */}
+      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+        
+        {/* Page Size */}
+        <Select
+          size="small"
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(e.target.value);
+            resetPagination();
+          }}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={100}>100</MenuItem>
+        </Select>
+
+        {/* Name Search */}
+        <TextField
+          size="small"
+          label="Search by name"
+          value={nameFilterInput}
+          onChange={(e) => {
+            setNameFilterInput(e.target.value);
+            resetPagination();
+          }}
+        />
+
+        {/* Status Filter */}
+        <Select
+          size="small"
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            resetPagination();
+          }}
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="approved">Approved</MenuItem>
+          <MenuItem value="waitlisted">Waitlisted</MenuItem>
+        </Select>
+      </Box>
+
+    </Box>
+  );
 }
+
 
 function AppContent({ onLogout }) {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(20)
   const [pageItemMapping, setPageItemMapping] = useState({})
   const [lastItemViewed, setLastItemViewed] = useState(null)
+  const [nameFilterInput, setNameFilterInput] = useState('');
+  const [debouncedNameFilter, setDebouncedNameFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  
 
   const { isPending, error, data } = useQuery({
-    queryKey: ['users', page, lastItemViewed],
+    queryKey: ['users', page, lastItemViewed, debouncedNameFilter, statusFilter, pageSize],
     queryFn: makeRequest,
-  })
+  });
 
+  useEffect(() => {
+    if (!data) return;
+  
+    // If filters result in empty data on ANY page
+    if (data.body.length === 0 && page > 0) {
+      setLastItemViewed(null);
+      setPageItemMapping({});
+      setPage(0);
+    }
+  }, [data, page]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedNameFilter(nameFilterInput)
+    }, 500)
+    return () => clearTimeout(id)
+  }, [nameFilterInput])
+
+  
   const handleNextPage = () => {
     if (data?.body?.length > 0) {
       const item = Number(data.last_evaluated_key.slice(1,-1))
       setLastItemViewed(item);
       setPageItemMapping((prev) => ({
-        ...prev,
-        [page]: item
-      }))
-      setPage(page + 1);
-      console.log('page', page)
+      ...prev,
+      [page]: item
+    }))
+    setPage(page + 1);
+  console.log('page', page)
       console.log(pageItemMapping)
     }
   };
@@ -525,18 +604,61 @@ function AppContent({ onLogout }) {
     setPageItemMapping({});
     setPage(0);
     return
-  }
-  if (data.body.length === 0) return 'No users found';
+  };
 
+  const resetPagination = () => {
+    setLastItemViewed(null);
+    setPageItemMapping({});
+    setPage(0);
+  };
+
+
+  if (data.body.length === 0) {
+    return (
+      <>
+        <Header
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
+          onLogout={onLogout}
+  
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+  
+          nameFilterInput={nameFilterInput}
+          setNameFilterInput={setNameFilterInput}
+  
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+  
+          resetPagination={resetPagination}
+        />
+  
+        <Typography sx={{ mt: 3 }}>No users found</Typography>
+      </>
+    );
+  }
+  
   return (
-    <>
-      <Header 
-        onPrevPage={handlePrevPage} 
-        onNextPage={handleNextPage}
-        onLogout={onLogout}
-      />
-      <Users users={data.body}/>
-    </>
+      <>
+        <Header
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
+          onLogout={onLogout}
+    
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+    
+          nameFilterInput={nameFilterInput}
+          setNameFilterInput={setNameFilterInput}
+    
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+    
+          resetPagination={resetPagination}
+        />
+    
+        <Users users={data.body} />
+      </>
   )
 }
 
