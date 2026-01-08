@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+
+/* Filters, select and text input */
+.MuiTextField-root, .MuiSelect-root {
+  min-width: 150px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  color: #f5f5f5;
+}
+.MuiInputBase-input {
+  color: #f5f5f5;
+}
+.MuiInputLabel-root {
+  color: #bbb;
+}
