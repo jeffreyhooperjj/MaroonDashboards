@@ -1,0 +1,17 @@
+services:
+    admin-dashboard:
+        build:
+            context: ./app
+            dockerfile: Dockerfile
+            target: development
+        container_name: maroon-admin-dashboard
+        ports:
+            - "80:5173"
+        volumes:
+            - ./app/:/app/
+            - /app/node_modules
+        environment:
+            - NODE_ENV=development
+            - VITE_API_URL=${VITE_API_URL:-https://h9mgp2jta3.us-east-2.awsapprunner.com}
+        stdin_open: true
+        tty: true

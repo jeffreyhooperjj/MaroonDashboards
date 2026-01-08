@@ -7,6 +7,13 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Commands to run 
+```
+docker-compose down             ## When new dependencies.
+docker-compose build --no-cache ## Will run with hot reload
+docker-compose up
+docker exec -it maroon-admin-dashboard /bin/sh ## Will attach the docker shell
+```
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
