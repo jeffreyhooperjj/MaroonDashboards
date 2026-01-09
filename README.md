@@ -11,7 +11,7 @@ Currently, two official plugins are available:
 ```
 docker-compose down             ## When new dependencies.
 docker-compose build --no-cache ## Will run with hot reload
-docker-compose up
+docker-compose up               ## Navigate to http://localhost:80 after
 docker exec -it maroon-admin-dashboard /bin/sh ## Will attach the docker shell
 ```
 ## Expanding the ESLint configuration
