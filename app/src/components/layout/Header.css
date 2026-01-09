@@ -23,12 +23,19 @@
 	align-items: center;
 }
 
-.header-pagination {
-	margin-top: 8px;
+.header-filters-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 16px;
 }
 
 .header-filters {
 	display: flex;
 	gap: 16px;
-	margin-top: 16px;
+}
+
+.header-pagination {
+	display: flex;
+	gap: 8px;
 }
