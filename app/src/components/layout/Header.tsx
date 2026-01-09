@@ -29,7 +29,6 @@ export function Header({
   return (
     <Box className="header-container">
       <Box className="header-content">
-        {/* Top Row */}
         <Box className="header-top-row">
           <h1>Maroon Admin Panel</h1>
 
@@ -38,11 +37,8 @@ export function Header({
           </Button>
         </Box>
 
-        {/* Filters and Pagination Row */}
         <Box className="header-filters-row">
-          {/* Filters Left */}
           <Box className="header-filters">
-            {/* Page Size */}
             <Select
               size="small"
               value={pageSize}
@@ -57,7 +53,6 @@ export function Header({
               <MenuItem value={100}>100</MenuItem>
             </Select>
 
-            {/* Name Search */}
             <TextField
               size="small"
               label="Search by name"
@@ -68,7 +63,6 @@ export function Header({
               }}
             />
 
-            {/* Status Filter */}
             <Select
               size="small"
               value={statusFilter}
@@ -83,7 +77,6 @@ export function Header({
             </Select>
           </Box>
 
-          {/* Pagination Buttons Right */}
           <Box className="header-pagination">
             <Button size="medium" color="primary" onClick={onPrevPage}>
               Prev Page

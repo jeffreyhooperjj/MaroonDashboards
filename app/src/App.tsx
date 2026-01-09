@@ -86,7 +86,7 @@ function Login({ onLoginSuccess }) {
     const { nextStep } = await signIn({
       username: phoneNumber,
       options: {
-        authFlowType: 'CUSTOM_WITHOUT_SRP' // Changed from CUSTOM_WITH_SRP
+        authFlowType: 'CUSTOM_WITHOUT_SRP'
       }
     });
 
@@ -106,7 +106,6 @@ function Login({ onLoginSuccess }) {
     setLoading(true);
     
     try {
-      // Re-initiate sign-in to resend OTP
       await signIn({
         username: phoneNumber,
         options: {
@@ -249,13 +248,10 @@ function AppContent({ onLogout }) {
     queryFn: makeRequest,
   });
 
-  // Client-side filtering
   const filteredUsers = data?.body?.filter(user => {
-    // Name filter
     const nameMatch = !nameFilterInput || 
       user.name?.toLowerCase().includes(nameFilterInput.toLowerCase());
     
-    // Status filter
     const statusMatch = statusFilter === 'all' ||
       (statusFilter === 'waitlisted' && user.waitlisted) ||
       (statusFilter === 'approved' && !user.waitlisted);
@@ -266,7 +262,6 @@ function AppContent({ onLogout }) {
   useEffect(() => {
     if (!data) return;
   
-    // If filters result in empty data on ANY page
     if (data.body.length === 0 && page > 0) {
       setLastItemViewed(null);
       setPageItemMapping({});

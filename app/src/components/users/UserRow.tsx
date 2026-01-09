@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box, Card, CardContent, Paper, Grid, Typography, Button,
-  Chip, Select, MenuItem, Snackbar, Alert, Stack
+  Chip, Select, MenuItem, Snackbar, Alert, Stack, IconButton
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchAuthSession } from 'aws-amplify/auth';
@@ -20,6 +20,8 @@ export function UserRow({ user }: UserRowProps) {
   const [isWaitlisted, setIsWaitlisted] = useState(user.waitlisted);
   const [imageLoadStates, setImageLoadStates] = useState<Record<number, boolean>>({});
   const [imageErrorStates, setImageErrorStates] = useState<Record<number, boolean>>({});
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [imagesToLoad, setImagesToLoad] = useState<Set<number>>(new Set([0, 1]));
   const queryClient = useQueryClient();
 
   const approveUserMutation = useMutation({
@@ -42,15 +44,26 @@ export function UserRow({ user }: UserRowProps) {
     },
     onSuccess: () => {
       setSnackbar({ open: true, message: 'User approved successfully!', severity: 'success' });
-      // Update local state immediately
       setIsWaitlisted(false);
-      // Invalidate and refetch users query
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
     onError: () => {
       setSnackbar({ open: true, message: 'Failed to approve user', severity: 'error' });
     },
   });
+
+  useEffect(() => {
+    const pictures = user.pictures || [];
+    if (pictures.length === 0) return;
+    
+    setImagesToLoad(prev => {
+      const newSet = new Set(prev);
+      newSet.add(currentPhotoIndex);
+      const nextIndex = currentPhotoIndex === pictures.length - 1 ? 0 : currentPhotoIndex + 1;
+      newSet.add(nextIndex);
+      return newSet;
+    });
+  }, [currentPhotoIndex, user.pictures]);
 
   const renderStatus = (user: any) => {
     const status = isWaitlisted ? 'Waitlisted' : 'Approved';
@@ -155,65 +168,145 @@ export function UserRow({ user }: UserRowProps) {
 
   const renderImages = (user: any) => {
     const pictures = user.pictures || [];
+    if (pictures.length === 0) return <Typography>No photos</Typography>;
+    
+    const currentPicture = pictures[currentPhotoIndex];
+    
     return (
       <Box className="user-images-column">
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {pictures.slice(0, 4).map((pic: any, index: number) => (
-            <Box key={index} sx={{ textAlign: 'center' }}>
-              <Paper
-                sx={{
-                  width: 64,
-                  height: 80,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: 'grey.800'
-                }}
-              >
-                {!imageLoadStates[index] && !imageErrorStates[index] && (
+        <Box sx={{ position: 'relative', width: '100%', mb: 1 }}>
+          <Paper
+            sx={{
+              width: '100%',
+              height: 300,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'grey.800',
+              position: 'relative'
+            }}
+          >
+            {!imageLoadStates[currentPhotoIndex] && !imageErrorStates[currentPhotoIndex] && (
+              <img 
+                src={loadingSvg} 
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  position: 'absolute'
+                }} 
+                alt="Loading" 
+              />
+            )}
+            {imageErrorStates[currentPhotoIndex] ? (
+              <img 
+                src={alertSvg} 
+                style={{
+                  width: '60px',
+                  height: '60px'
+                }} 
+                alt="Error loading image" 
+              />
+            ) : (
+              <>
+                {imagesToLoad.has(currentPhotoIndex) ? (
+                  <img 
+                    src={currentPicture.download_link} 
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      opacity: imageLoadStates[currentPhotoIndex] ? 1 : 0
+                    }} 
+                    alt={`User photo ${currentPhotoIndex + 1}`}
+                    onLoad={() => setImageLoadStates(prev => ({ ...prev, [currentPhotoIndex]: true }))}
+                    onError={() => setImageErrorStates(prev => ({ ...prev, [currentPhotoIndex]: true }))}
+                  />
+                ) : (
                   <img 
                     src={loadingSvg} 
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      position: 'absolute'
+                      width: '60px',
+                      height: '60px'
                     }} 
                     alt="Loading" 
                   />
                 )}
-                {imageErrorStates[index] ? (
-                  <img 
-                    src={alertSvg} 
-                    style={{
-                      width: '40px',
-                      height: '40px'
-                    }} 
-                    alt="Error loading image" 
-                  />
-                ) : (
-                  <img 
-                    src={pictures[index].download_link} 
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      opacity: imageLoadStates[index] ? 1 : 0
-                    }} 
-                    alt={`User ${index + 1}`}
-                    onLoad={() => setImageLoadStates(prev => ({ ...prev, [index]: true }))}
-                    onError={() => setImageErrorStates(prev => ({ ...prev, [index]: true }))}
-                  />
-                )}
-              </Paper>
-              <Button
-                size="small"
-                sx={{ fontSize: '0.7rem', mt: 0.5 }}
-                color="primary"
-              >
-                Download
-              </Button>
-            </Box>
-          ))}
+              </>
+            )}
+            
+            {pictures.length > 1 && (() => {
+              const nextIndex = currentPhotoIndex === pictures.length - 1 ? 0 : currentPhotoIndex + 1;
+              return imagesToLoad.has(nextIndex) && !imageLoadStates[nextIndex] && !imageErrorStates[nextIndex] ? (
+                <img 
+                  src={pictures[nextIndex].download_link}
+                  style={{ display: 'none' }}
+                  alt="Preload"
+                  onLoad={() => setImageLoadStates(prev => ({ ...prev, [nextIndex]: true }))}
+                  onError={() => setImageErrorStates(prev => ({ ...prev, [nextIndex]: true }))}
+                />
+              ) : null;
+            })()}
+            
+            {pictures.length > 1 && (
+              <>
+                <IconButton
+                  onClick={() => setCurrentPhotoIndex((prev) => prev === 0 ? pictures.length - 1 : prev - 1)}
+                  sx={{
+                    position: 'absolute',
+                    left: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
+                >
+                  ←
+                </IconButton>
+                <IconButton
+                  onClick={() => setCurrentPhotoIndex((prev) => prev === pictures.length - 1 ? 0 : prev + 1)}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
+                >
+                  →
+                </IconButton>
+              </>
+            )}
+          </Paper>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 0.5, 
+            mt: 1,
+            alignItems: 'center'
+          }}>
+            {pictures.map((_: any, index: number) => (
+              <Box
+                key={index}
+                onClick={() => setCurrentPhotoIndex(index)}
+                sx={{
+                  width: currentPhotoIndex === index ? 12 : 8,
+                  height: currentPhotoIndex === index ? 12 : 8,
+                  borderRadius: '50%',
+                  bgcolor: currentPhotoIndex === index ? 'primary.main' : 'grey.500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  '&:hover': { bgcolor: currentPhotoIndex === index ? 'primary.main' : 'grey.400' }
+                }}
+              />
+            ))}
+            <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
+              {currentPhotoIndex + 1} / {pictures.length}
+            </Typography>
+          </Box>
         </Box>
         <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
           <Select

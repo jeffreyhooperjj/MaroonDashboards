@@ -1,29 +1,20 @@
-/* ========================================
-   CUSTOMIZABLE COLOR SCHEME
-   Inspired by Twitter/X Theme
-   ======================================== */
 :root {
-	/* Background Colors (4 levels) */
-	--color-bg-primary: #000000; /* Pure Black - Main background */
-	--color-bg-secondary: #16181c; /* Dark Gray - Card backgrounds */
-	--color-bg-tertiary: #202327; /* Medium Gray - Hover states */
-	--color-bg-quaternary: #2f3336; /* Lighter Gray - Active states */
+	--color-bg-primary: #000000;
+	--color-bg-secondary: #16181c;
+	--color-bg-tertiary: #202327;
+	--color-bg-quaternary: #2f3336;
 
-	/* Text Colors */
-	--color-text-primary: #e7e9ea; /* Almost White - Primary text */
-	--color-text-secondary: #71767b; /* Muted Gray - Secondary text */
+	--color-text-primary: #e7e9ea;
+	--color-text-secondary: #71767b;
 
-	/* Accent Color */
-	--color-accent: #1d9bf0; /* Twitter Blue - Links, buttons, accents */
+	--color-accent: #1d9bf0;
 }
 
-/* Apply color scheme globally */
 body {
 	background-color: var(--color-bg-primary);
 	color: var(--color-text-primary);
 }
 
-/* Global button hover styles */
 button:hover:not(:disabled) {
 	background-color: var(--color-bg-tertiary) !important;
 	transition: background-color 0.3s ease;
@@ -74,7 +65,6 @@ button:hover:not(:disabled) {
 	color: #888;
 }
 
-/* Filters, select and text input */
 .MuiTextField-root,
 .MuiSelect-root {
 	min-width: 150px;
