@@ -1,57 +1,90 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* ========================================
+   CUSTOMIZABLE COLOR SCHEME
+   Inspired by Twitter/X Theme
+   ======================================== */
+:root {
+	/* Background Colors (4 levels) */
+	--color-bg-primary: #000000; /* Pure Black - Main background */
+	--color-bg-secondary: #16181c; /* Dark Gray - Card backgrounds */
+	--color-bg-tertiary: #202327; /* Medium Gray - Hover states */
+	--color-bg-quaternary: #2f3336; /* Lighter Gray - Active states */
+
+	/* Text Colors */
+	--color-text-primary: #e7e9ea; /* Almost White - Primary text */
+	--color-text-secondary: #71767b; /* Muted Gray - Secondary text */
+
+	/* Accent Color */
+	--color-accent: #1d9bf0; /* Twitter Blue - Links, buttons, accents */
 }
 
+/* Apply color scheme globally */
+body {
+	background-color: var(--color-bg-primary);
+	color: var(--color-text-primary);
+}
+
+/* Global button hover styles */
+button:hover:not(:disabled) {
+	background-color: var(--color-bg-tertiary) !important;
+	transition: background-color 0.3s ease;
+}
+
+#root {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+#header {
+	margin-bottom: 4rem;
+}
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+	height: 6em;
+	padding: 1.5em;
+	will-change: filter;
+	transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+	filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+	filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+	a:nth-of-type(2) .logo {
+		animation: logo-spin infinite 20s linear;
+	}
 }
 
 .card {
-  padding: 2em;
+	padding: 2em;
 }
 
 .read-the-docs {
-  color: #888;
+	color: #888;
 }
-
 
 /* Filters, select and text input */
-.MuiTextField-root, .MuiSelect-root {
-  min-width: 150px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  color: #f5f5f5;
+.MuiTextField-root,
+.MuiSelect-root {
+	min-width: 150px;
+	background-color: #f5f5f5;
+	border-radius: 8px;
+	color: #f5f5f5;
 }
 .MuiInputBase-input {
-  color: #f5f5f5;
+	color: #f5f5f5;
 }
 .MuiInputLabel-root {
-  color: #bbb;
+	color: #bbb;
 }

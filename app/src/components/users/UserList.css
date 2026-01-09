@@ -1,0 +1,11 @@
+.user-list-container {
+	max-width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
+}
+
+.user-list-item {
+	margin: 16px 0;
+	padding: 0;
+}

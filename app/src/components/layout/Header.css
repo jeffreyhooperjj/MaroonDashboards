@@ -1,0 +1,34 @@
+.header-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	padding: 16px;
+	border-bottom: 1px solid #ddd;
+	background-color: #121212;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.header-content {
+	width: 100%;
+	max-width: 1200px;
+}
+
+.header-top-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header-pagination {
+	margin-top: 8px;
+}
+
+.header-filters {
+	display: flex;
+	gap: 16px;
+	margin-top: 16px;
+}
