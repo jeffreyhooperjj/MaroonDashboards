@@ -52,6 +52,8 @@ export function UserRow({ user }: UserRowProps) {
     },
   });
 
+
+
   useEffect(() => {
     const pictures = user.pictures || [];
     if (pictures.length === 0) return;
@@ -303,9 +305,6 @@ export function UserRow({ user }: UserRowProps) {
                 }}
               />
             ))}
-            <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
-              {currentPhotoIndex + 1} / {pictures.length}
-            </Typography>
           </Box>
         </Box>
         <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>

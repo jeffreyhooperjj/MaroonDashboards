@@ -5,6 +5,7 @@ import {
   QueryClient,
   QueryClientProvider,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query'
 import { Amplify } from 'aws-amplify';
 import { signIn, signOut, getCurrentUser, fetchAuthSession, confirmSignIn } from 'aws-amplify/auth';
@@ -247,6 +248,18 @@ function AppContent({ onLogout }) {
     queryKey: ['users', page, lastItemViewed, pageSize],
     queryFn: makeRequest,
   });
+
+  const queryClientInstance = useQueryClient();
+
+  useEffect(() => {
+    if (data?.last_evaluated_key && data?.body?.length > 0) {
+      const nextPageLastItem = Number(data.last_evaluated_key.slice(1,-1));
+      queryClientInstance.prefetchQuery({
+        queryKey: ['users', page + 1, nextPageLastItem, pageSize],
+        queryFn: makeRequest,
+      });
+    }
+  }, [data, page, pageSize, queryClientInstance]);
 
   const filteredUsers = data?.body?.filter(user => {
     const nameMatch = !nameFilterInput || 
